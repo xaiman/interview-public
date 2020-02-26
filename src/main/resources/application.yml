@@ -1,0 +1,18 @@
+server:
+  port: 18090
+
+
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/test
+    username: super
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true

@@ -2,36 +2,53 @@ package com.devexperts.service;
 
 import com.devexperts.account.Account;
 import com.devexperts.account.AccountKey;
+import com.devexperts.exception.AccountNotFound;
+import com.devexperts.repository.AccountRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.validation.constraints.NotNull;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AccountServiceImpl implements AccountService {
 
-    private final List<Account> accounts = new ArrayList<>();
+    @NotNull
+    private final AccountRepository accountRepository;
 
     @Override
     public void clear() {
-        accounts.clear();
+        accountRepository.deleteAll();
     }
 
     @Override
     public void createAccount(Account account) {
-        accounts.add(account);
+        accountRepository.saveAndFlush(account);
     }
 
     @Override
     public Account getAccount(long id) {
-        return accounts.stream()
-                .filter(account -> account.getAccountKey() == AccountKey.valueOf(id))
-                .findAny()
-                .orElse(null);
+        return accountRepository.findById(AccountKey.valueOf(id))
+                .orElseThrow(() -> new AccountNotFound("account is not found"));
     }
 
     @Override
-    public void transfer(Account source, Account target, double amount) {
-        //do nothing for now
+    public Boolean transfer(Account source,
+                            Account target,
+                            double amount) throws InterruptedException,
+            ExecutionException {
+        Executor executor = Executors.newSingleThreadExecutor();
+        CompletableFuture<Boolean> completableFuture = CompletableFuture.supplyAsync(() -> {
+            source.withdraw(amount);
+            target.deposit(amount);
+            return true;
+        }, executor);
+        return completableFuture.get();
     }
+
 }

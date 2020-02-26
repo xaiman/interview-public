@@ -1,10 +1,28 @@
 package com.devexperts.account;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
+
+@Entity
+@Table(name = "account")
+@NoArgsConstructor
+@Getter
 public class Account {
-    private final AccountKey accountKey;
-    private final String firstName;
-    private final String lastName;
-    private Double balance;
+
+    @EmbeddedId
+    private AccountKey accountKey;
+
+    @Column(length = 50)
+    private String firstName;
+
+    @Column(length = 50)
+    private String lastName;
+
+    @Column(columnDefinition = "NUMERIC")
+    private double balance;
+
 
     public Account(AccountKey accountKey, String firstName, String lastName, Double balance) {
         this.accountKey = accountKey;
@@ -13,23 +31,15 @@ public class Account {
         this.balance = balance;
     }
 
-    public AccountKey getAccountKey() {
-        return accountKey;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public Double getBalance() {
-        return balance;
-    }
-
-    public void setBalance(Double balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
+    }
+
+    public void withdraw(double amount) {
+        balance -= amount;
+    }
+
+    public void deposit(double amount) {
+        balance += amount;
     }
 }

@@ -2,6 +2,8 @@ package com.devexperts.service;
 
 import com.devexperts.account.Account;
 
+import java.util.concurrent.ExecutionException;
+
 public interface AccountService {
 
     /**
@@ -28,10 +30,10 @@ public interface AccountService {
 
     /**
      * Transfers given amount of money from source account to target account
-     *
-     * @param source account to transfer money from
+     *  @param source account to transfer money from
      * @param target account to transfer money to
      * @param amount dollar amount to transfer
-     * */
-    void transfer(Account source, Account target, double amount);
+     * @return  */
+    Boolean transfer(Account source, Account target, double amount)
+        throws InterruptedException, ExecutionException;
 }

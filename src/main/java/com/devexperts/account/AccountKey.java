@@ -1,5 +1,8 @@
 package com.devexperts.account;
 
+import javax.persistence.Embeddable;
+import java.io.Serializable;
+
 /**
  * Unique Account identifier
  *
@@ -7,8 +10,13 @@ package com.devexperts.account;
  * NOTE: we suspect that later {@link #accountId} is not going to be uniquely identifying an account,
  * as we might add human-readable account representation and some clearing codes for partners.
  * */
-public class AccountKey {
-    private final long accountId;
+@Embeddable
+public class AccountKey implements Serializable {
+    private long accountId;
+
+    private AccountKey(){
+
+    }
 
     private AccountKey(long accountId) {
         this.accountId = accountId;
